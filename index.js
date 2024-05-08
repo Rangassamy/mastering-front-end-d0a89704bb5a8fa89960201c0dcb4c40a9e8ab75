@@ -17,41 +17,65 @@
 //---------------------------------------------------------//
 
 const countriesContainer = document.querySelector(".countries-container");
-let countries = [];
+const btnSort = document.querySelectorAll(".btnSort");
+let countriesData = [];
+let sortMethod = "maxToMin";
+
 async function fetchCountries() {
   await fetch("https://restcountries.com/v3.1/all")
     .then((res) => res.json())
-    .then((data) => (countries = data));
+    .then((data) => (countriesData = data));
 
-  // console.log(countries);
-  return countries;
+  console.log(countriesData);
+  countriesDisplay();
 }
 
-async function countriesDisplay() {
-  await fetchCountries();
-  countriesContainer.innerHTML = countries
-    .filter((country) => country.name.official.includes(inputSearch.value))
+function countriesDisplay() {
+  countriesContainer.innerHTML = countriesData
+    .filter((country) =>
+      country.translations.fra.common
+        .toLowerCase()
+        .includes(inputSearch.value.toLowerCase())
+    )
+    .sort((a, b) => {
+      if (sortMethod === "maxToMin") {
+        return b.population - a.population;
+      } else if (sortMethod === "minToMax") {
+        return a.population - b.population;
+      } else if (sortMethod === "alpha") {
+        return a.translations.fra.common.localeCompare(
+          b.translations.fra.common
+        );
+      }
+    })
     .slice(0, inputRange.value)
     .map(
       (country) =>
         `
-      <div class="card">
-      <img src="${country.flags.png}">
-      <h2>${country.name.official}</h2>
-      <h3>${country.capital}</h3>
-      <p>Population : ${country.population}</p>
-      </div>
-    `
+          <div class="card">
+            <img src=${country.flags.svg} alt="drapeau ${
+          country.translations.fra.common
+        }" > 
+            <h2>${country.translations.fra.common}</h2>
+            <h4>${country.capital}</h4>
+            <p>Population : ${country.population.toLocaleString()}</p>
+          </div>
+        `
     )
     .join("");
 }
 
-inputRange.addEventListener("input", (e) => {
+window.addEventListener("load", fetchCountries);
+inputSearch.addEventListener("input", countriesDisplay);
+
+inputRange.addEventListener("input", () => {
   countriesDisplay();
   rangeValue.textContent = inputRange.value;
 });
-inputSearch.addEventListener("input", () => {
-  inputSearch.value;
-  countriesDisplay();
+
+btnSort.forEach((btn) => {
+  btn.addEventListener("click", (e) => {
+    sortMethod = e.target.id;
+    countriesDisplay();
+  });
 });
-countriesDisplay();
