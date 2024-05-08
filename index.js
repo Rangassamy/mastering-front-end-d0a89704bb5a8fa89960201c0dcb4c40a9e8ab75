@@ -15,13 +15,43 @@
 
 //---------------------------------------------------------//
 //---------------------------------------------------------//
-let dataCountry;
 
-async function dataInit() {
+const countriesContainer = document.querySelector(".countries-container");
+let countries = [];
+async function fetchCountries() {
   await fetch("https://restcountries.com/v3.1/all")
     .then((res) => res.json())
-    .then((data) => (dataCountry = data));
-  console.log(dataCountry);
+    .then((data) => (countries = data));
+
+  // console.log(countries);
+  return countries;
 }
 
-dataInit();
+async function countriesDisplay() {
+  await fetchCountries();
+  countriesContainer.innerHTML = countries
+    .filter((country) => country.name.official.includes(inputSearch.value))
+    .slice(0, inputRange.value)
+    .map(
+      (country) =>
+        `
+      <div class="card">
+      <img src="${country.flags.png}">
+      <h2>${country.name.official}</h2>
+      <h3>${country.capital}</h3>
+      <p>Population : ${country.population}</p>
+      </div>
+    `
+    )
+    .join("");
+}
+
+inputRange.addEventListener("input", (e) => {
+  countriesDisplay();
+  rangeValue.textContent = inputRange.value;
+});
+inputSearch.addEventListener("input", () => {
+  inputSearch.value;
+  countriesDisplay();
+});
+countriesDisplay();

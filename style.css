@@ -26,3 +26,25 @@ input[type="range"] {
   font-size: 1.2rem;
   transform: translateY(-3px);
 }
+
+.countries-container {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  text-align: center;
+  color: whitesmoke;
+}
+
+.countries-container > div {
+  border-radius: 20px;
+  padding: 20px 40px;
+  background: black;
+  margin: 5px;
+  max-height: 350px;
+  width: 20%;
+}
+
+.countries-container > div :first-of-type {
+  width: 90%;
+  margin: 0 auto 10px;
+}
